@@ -1,0 +1,36 @@
+{
+  "name": "kommonitor-harvester",
+  "version": "0.0.1",
+  "description": "KomMonitor Harvester API to harvest/transfer spatial data from one instance to another",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js",
+    "release": "release-it"
+  },
+  "keywords": [
+    "KomMonitor"
+  ],
+  "license": "Apache-2.0",
+  "private": true,
+  "dependencies": {
+    "connect": "^3.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "js-yaml": "^3.3.0",
+    "keycloak-js": "10.0.1",
+    "oas3-tools": "^2.2.3"
+  },
+  "devDependencies": {
+    "@release-it/keep-a-changelog": "^2.2.2",
+    "jshint": "^2.13.0",
+    "license-checker": "^25.0.1",
+    "npm-license-crawler": "^0.2.1",
+    "release-it": "^14.6.2"
+  },
+  "jshintConfig": {
+    "undef": true,
+    "unused": true,
+    "esversion": 8
+  }
+}
