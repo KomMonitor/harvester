@@ -16,8 +16,6 @@ externalDocs:
 servers:
 - url: http://localhost:8089/
 - url: https://localhost:8089/
-security:
-- basicAuth: []
 tags:
 - name: harvester
   description: Harvest data
@@ -284,7 +282,3 @@ components:
           schema:
             type: string
       content: {}
-  securitySchemes:
-    basicAuth:
-      type: http
-      scheme: basic
