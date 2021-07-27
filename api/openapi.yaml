@@ -242,8 +242,9 @@ components:
           format: date
         validEndDate:
           type: string
+          nullable: true
           description: end date of harvested features
-          format: date
+          format: date          
       description: period of validity information for spatial features
     AuthenticationType:
       type: object
