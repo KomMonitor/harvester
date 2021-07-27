@@ -231,6 +231,8 @@ components:
           numberOfHarvestedFeatures:
             type: number
             format: int32
+          errorOccurred:
+            $ref: '#/components/schemas/SummaryType_errorsOccurred'
     PeriodOfValidityType:
       type: object
       properties:
