@@ -5,6 +5,7 @@
 
  const encryptionHelper = require("./EncryptionHelperService");
  const keycloakHelper = require("./KeycloakHelperService");
+ let KommonitorHarvesterApi = require('kommonitorHarvesterApi');
 
  const simplifyGeometryParameterName = process.env.GEOMETRY_SIMPLIFICATION_PARAMETER_NAME;
  const simplifyGeometryParameterValue = process.env.GEOMETRY_SIMPLIFICATION_PARAMETER_VALUE;
@@ -20,9 +21,12 @@
  * returns spatial unit as GeoJSON string
  **/
 exports.fetchSpatialUnitById = async function(baseUrlPath, spatialUnitId, authenticationType) {
-  console.log("fetching spatial unit from KomMonitor data management API for id " + spatialUnitId);
+  console.log("fetching spatial unit from KomMonitor data management API with basepath " + baseUrlPath + " for id " + spatialUnitId);
 
   var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+
+  // if no auth is used then we must use public endpoint
+  baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
 
   //GET /spatial-units/{spatialUnitId}/allFeatures
   return await axios.get(baseUrlPath + "/spatial-units/" + spatialUnitId + "/allFeatures?" + simplifyGeometriesParameterQueryString, config)
@@ -48,9 +52,12 @@ exports.fetchSpatialUnitById = async function(baseUrlPath, spatialUnitId, authen
  * returns georesource as GeoJSON string
  **/
 exports.fetchGeoresourceById = async function(baseUrlPath, georesourceId, authenticationType) {
-  console.log("fetching georesource from KomMonitor data management API for id " + georesourceId);
+  console.log("fetching georesource from KomMonitor data management API with basepath " + baseUrlPath + " for id " + georesourceId);
 
   var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+
+  // if no auth is used then we must use public endpoint
+  baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
 
   //GET /georesources/{georesouceId}/allFeatures
   return await axios.get(baseUrlPath + "/georesources/" + georesourceId + "/allFeatures?" + simplifyGeometriesParameterQueryString, config)
@@ -78,9 +85,12 @@ exports.fetchGeoresourceById = async function(baseUrlPath, georesourceId, authen
  * returns indicator as GeoJSON string
  **/
 exports.fetchIndicatorById = async function(baseUrlPath, indicatorId, targetSpatialUnitId, authenticationType) {
-  console.log("fetching indicator from KomMonitor data management API for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitId);
+  console.log("fetching indicator from KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitId);
 
   var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+
+  // if no auth is used then we must use public endpoint
+  baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
 
   //GET /indicators/{indicatorId}/{targetSpatialUnitId}/allFeatures
   return await axios.get(baseUrlPath + "/indicators/" + indicatorId + "/" + targetSpatialUnitId + "/allFeatures?" + simplifyGeometriesParameterQueryString, config)
@@ -93,4 +103,11 @@ exports.fetchIndicatorById = async function(baseUrlPath, indicatorId, targetSpat
       console.log("Error when fetching indicator. Error was: " + error);
       throw error;
     });
+}
+
+function checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath) {
+  if (authenticationType.type == KommonitorHarvesterApi.AuthenticationType.TypeEnum.NONE) {
+    return baseUrlPath + "/public";
+  }
+  return baseUrlPath;
 }

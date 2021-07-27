@@ -17,7 +17,7 @@ let KommonitorHarvesterApi = require("kommonitorHarvesterApi");
  * 
  **/
 exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, geojsonString, periodOfValidityType, authenticationType) {
-  console.log("fetching spatial unit from KomMonitor data management API for id " + spatialUnitId);
+  console.log("integrating spatial unit into KomMonitor data management API with basepath " + baseUrlPath + " for id " + spatialUnitId);
 
   var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
   config.headers["Content-Type"] = "application/json";
@@ -35,32 +35,10 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
   //PUT /spatial-units/{spatialUnitId}
   return await axios.put(baseUrlPath + "/spatial-units/" + spatialUnitId, body, config)
     .then(response => {
-        var summaryType = new KommonitorHarvesterApi.SpatialUnitSummaryType();
-        summaryType.harvestProcessResult = SpatialUnitSummaryType.HarvestProcessResultEnum.COMPLETED_WITHOUT_ERRORS;
-        summaryType.numberOfHarvestedFeatures = JSON.parse(geojsonString).features.length;
-        summaryType.targetDatasetId = spatialUnitId;
-        summaryType.targetDatasetName = undefined;
-
-        return summaryType;      
+        return true;     
     })
     .catch(error => {
-      var summaryType = new KommonitorHarvesterApi.SpatialUnitSummaryType();
-        summaryType.harvestProcessResult = SpatialUnitSummaryType.HarvestProcessResultEnum.ERRORS_OCCURRED;
-        summaryType.numberOfHarvestedFeatures = 0;
-        summaryType.targetDatasetId = spatialUnitId;
-        summaryType.targetDatasetName = undefined;
-        summaryType.errorsOccurred = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
-        summaryType.errorsOccurred = [];
-
-        let errorType = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
-        errorType.code = error.code;
-        errorType.message = error.message;
-
-        summaryType.errorsOccurred.push(
-          errorType
-        );
-
-        return summaryType; 
+      throw error;
     });
 }
 
@@ -74,7 +52,7 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
  *
  **/
 exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, targetSpatialUnitId, indicatorValues, authenticationType) {
-  console.log("fetching indicator from KomMonitor data management API for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitId);
+  console.log("integrating indicator into KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitId);
 
   var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
   config.headers["Content-Type"] = "application/json";
