@@ -32,7 +32,7 @@ var isBase64 = function (str) {
 
 };
 
-var decryptAesCBC = function (encryptedString) {
+exports.decryptAesCBC = function (encryptedString) {
 
   var hashedKey = CryptoJS.SHA256(process.env.ENCRYPTION_PASSWORD);
 
@@ -66,4 +66,27 @@ var decryptAesCBC = function (encryptedString) {
   }
 
   return decryptedJson;
+};
+
+exports.decryptAPIResponseIfRequired = function (response) {
+  // if encrypted, then will look like:
+  // {encryptedData: encryptedData}
+  // using AES-CBC
+
+  if (JSON.parse(process.env.ENCRYPTION_COMPLETE_ENABLED) && response.data.encryptedData) {
+    try {
+      var encryptedString = response.data.encryptedData;
+
+      var decryptedJson = exports.decryptAesCBC(encryptedString);
+
+      response.data = decryptedJson;
+
+      return response;
+    } catch (error) {
+      console.error(error);
+      return response;
+    }
+  }
+
+  return response;
 };

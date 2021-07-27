@@ -1,6 +1,8 @@
 const qs = require('querystring');
 const axios = require("axios");
 const fs = require("fs");
+const { AuthenticationType } = require('../datamodel/model/AuthenticationType');
+let EncryptionHelper = require('./EncryptionHelperService');
 
 // init methode, die die keycloak config ausliest!
 
@@ -11,20 +13,17 @@ var keycloakClientID = undefined;
 var keycloakClientSecret = undefined;
 var keycloakRealm = undefined;
 
-var initKeycloak = function (url, realm,
-  clientID, user, password) {
-  keycloakTargetURL = url;
-  keycloakRealm = realm;
-  keycloakClientID = clientID;
-  keycloakUser = user;
-  keycloakUserPassword = password;
+var initKeycloak = function (authenticationType) {
+  keycloakTargetURL = authenticationType.keycloakUrl;
+  keycloakRealm = authenticationType.keycloakRealm;
+  keycloakClientID = authenticationType.keycloakClientId;
+  keycloakUser = authenticationType.username;
+  keycloakUserPassword = EncryptionHelper.decryptAesCBC(authenticationType.password);
 };
 
-const requestKeycloakToken = async function (url, realm,
-  clientID, user, password) {
+const requestKeycloakToken = async function (authenticationType) {
 
-  initKeycloak(url, realm,
-    clientID, user, password);
+  initKeycloak(authenticationType);
 
   var parameters = {
     "username": keycloakUser,
@@ -66,19 +65,19 @@ const requestKeycloakToken = async function (url, realm,
     })
 };
 
-const getKeycloakAxiosConfig = async function (url, realm,
-  clientID, user, password) {
+const getKeycloakAxiosConfig = async function (authenticationType) {
 
   var config = {
     headers: {}
   };
 
-  // get bearer token and make auth header
-  var bearerToken = await requestKeycloakToken(url, realm,
-    clientID, user, password);
+  if(authenticationType.type == AuthenticationType.TypeEnum.KEYCLOAK){
+    // get bearer token and make auth header
+    var bearerToken = await requestKeycloakToken(authenticationType);
 
-  config.headers = {
-    'Authorization': 'Bearer ' + bearerToken
+    config.headers = {
+      'Authorization': 'Bearer ' + bearerToken
+    }
   }
 
   return config;
