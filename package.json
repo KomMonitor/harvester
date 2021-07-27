@@ -14,12 +14,15 @@
   "license": "Apache-2.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.21.1",
     "connect": "^3.2.0",
     "cors": "^2.8.5",
+    "crypto-js": "^4.1.1",
     "dotenv": "^10.0.0",
     "js-yaml": "^3.3.0",
     "keycloak-js": "10.0.1",
-    "oas3-tools": "^2.2.3"
+    "oas3-tools": "^2.2.3",
+    "querystring": "^0.2.1"
   },
   "devDependencies": {
     "@release-it/keep-a-changelog": "^2.2.2",
