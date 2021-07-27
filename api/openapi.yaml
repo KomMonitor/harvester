@@ -180,16 +180,21 @@ components:
           description: target dataset id from target KomMonitor instance
         sourceFeatureIdPrefix:
           type: string
-          description: optional suffix for source dataset feature IDs
+          nullable: true
+          description: optional prefix for source dataset feature IDs
         targetFeatureIdPrefix:
           type: string
-          description: optional suffix for target dataset feature IDs
-        sourceFeatureIdSuffix:
-          type: string
-          description: optional suffix for source dataset feature IDs
-        targetFeatureIdSuffix:
-          type: string
+          nullable: true
           description: optional prefix for target dataset feature IDs
+        sourceFeatureNamePrefix:
+          type: string
+          nullable: true
+          description: optional prefix for source dataset feature names
+        targetFeatureNamePrefix:
+          type: string
+          nullable: true
+          description: optional prefix for target dataset feature names  
+
       description: mapping details to transfer certain spatial dataset features from
         one KomMonitor instance to another
     SpatialUnitDataMappingType:
