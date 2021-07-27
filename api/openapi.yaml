@@ -254,6 +254,7 @@ components:
           enum:
           - BASICAUTH
           - KEYCLOAK
+          - NONE
         username:
           type: string
           description: the user name to authenticate against KomMonitor instance
