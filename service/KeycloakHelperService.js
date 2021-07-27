@@ -1,7 +1,8 @@
 const qs = require('querystring');
 const axios = require("axios");
 const fs = require("fs");
-const { AuthenticationType } = require('../datamodel/model/AuthenticationType');
+
+let KommonitorHarvesterApi = require('kommonitorHarvesterApi');
 let EncryptionHelper = require('./EncryptionHelperService');
 
 // init methode, die die keycloak config ausliest!
@@ -71,7 +72,7 @@ const getKeycloakAxiosConfig = async function (authenticationType) {
     headers: {}
   };
 
-  if(authenticationType.type == AuthenticationType.TypeEnum.KEYCLOAK){
+  if(authenticationType.type == KommonitorHarvesterApi.AuthenticationType.TypeEnum.KEYCLOAK){
     // get bearer token and make auth header
     var bearerToken = await requestKeycloakToken(authenticationType);
 

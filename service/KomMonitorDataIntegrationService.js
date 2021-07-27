@@ -2,12 +2,10 @@
 
  // axios os used to execute HTTP requests in a Promise-based manner
  const axios = require("axios");
-const { SpatialUnitSummaryType } = require("../datamodel/model/SpatialUnitSummaryType");
-const { SummaryTypeErrorsOccurred } = require("../datamodel/model/SummaryTypeErrorsOccurred");
-const { IndicatorSpatialUnitMappingResultType } = require('../datamodel/model/IndicatorSpatialUnitMappingResultType');
+
+let KommonitorHarvesterApi = require("kommonitorHarvesterApi");
 
  const keycloakHelper = require("./KeycloakHelperService");
- require('../datamodel/model/PeriodOfValidityType');
 
 /**
  * send request against KomMonitor DataManagement API to update spatial unit according to id
@@ -37,7 +35,7 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
   //PUT /spatial-units/{spatialUnitId}
   return await axios.put(baseUrlPath + "/spatial-units/" + spatialUnitId, body, config)
     .then(response => {
-        var summaryType = new SpatialUnitSummaryType();
+        var summaryType = new KommonitorHarvesterApi.SpatialUnitSummaryType();
         summaryType.harvestProcessResult = SpatialUnitSummaryType.HarvestProcessResultEnum.COMPLETED_WITHOUT_ERRORS;
         summaryType.numberOfHarvestedFeatures = JSON.parse(geojsonString).features.length;
         summaryType.targetDatasetId = spatialUnitId;
@@ -46,15 +44,15 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
         return summaryType;      
     })
     .catch(error => {
-      var summaryType = new SpatialUnitSummaryType();
+      var summaryType = new KommonitorHarvesterApi.SpatialUnitSummaryType();
         summaryType.harvestProcessResult = SpatialUnitSummaryType.HarvestProcessResultEnum.ERRORS_OCCURRED;
         summaryType.numberOfHarvestedFeatures = 0;
         summaryType.targetDatasetId = spatialUnitId;
         summaryType.targetDatasetName = undefined;
-        summaryType.errorsOccurred = new SummaryTypeErrorsOccurred();
-        summaryType.errorsOccurred = new Array();
+        summaryType.errorsOccurred = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
+        summaryType.errorsOccurred = [];
 
-        let errorType = new SummaryTypeErrorsOccurred();
+        let errorType = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
         errorType.code = error.code;
         errorType.message = error.message;
 
@@ -104,7 +102,7 @@ exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, target
   return await axios.put(baseUrlPath + "/indicators/" + indicatorId, body, config)
     .then(response => {
 
-      let mappingResultType = new IndicatorSpatialUnitMappingResultType();
+      let mappingResultType = new KommonitorHarvesterApi.IndicatorSpatialUnitMappingResultType();
       mappingResultType.targetSpatialUnitDatasetId = targetSpatialUnitId;
       mappingResultType.numberOfHarvestedFeatures =  indicatorValues.length;
 
@@ -113,10 +111,10 @@ exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, target
     .catch(error => {
       console.log("Error when fetching indicator. Error was: " + error);
       
-      let mappingResultType = new IndicatorSpatialUnitMappingResultType();
+      let mappingResultType = new KommonitorHarvesterApi.IndicatorSpatialUnitMappingResultType();
       mappingResultType.targetSpatialUnitDatasetId = targetSpatialUnitId;
       mappingResultType.numberOfHarvestedFeatures =  0;
-      mappingResultType.errorOccurred = new SummaryTypeErrorsOccurred();
+      mappingResultType.errorOccurred = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
       mappingResultType.errorOccurred.code = error.code;
       mappingResultType.errorOccurred.message = error.message;
 
