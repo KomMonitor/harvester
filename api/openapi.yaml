@@ -262,6 +262,12 @@ components:
         keycloakUrl:
           type: string
           description: optional url of Keycloak instance URL to authenticate if type='KEYCLOAK'
+        keycloakRealm:
+          type: string
+          description: optional name of Keycloak realm to authenticate if type='KEYCLOAK'
+        keycloakClientId:
+          type: string
+          description: optional clientId of Keycloak realm to authenticate if type='KEYCLOAK'
       description: information about authentication details in order to access the
         required data
     SummaryType_errorsOccurred:
