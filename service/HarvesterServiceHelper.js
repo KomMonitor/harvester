@@ -87,6 +87,9 @@ async function fetchAndIntegrateSpatialUnitFeatures(sourceInstance, spatialUnitM
     }
 
     if (geojson) {
+
+      geojson = applyOptionalPrefixes(geojson, spatialUnitMappingDef);
+
       await KomMonitorDataIntegrator.integrateSpatialUnitById(targetInstance.url, spatialUnitMappingDef.targetDatasetId, JSON.stringify(geojson), spatialUnitMappingDef.targetPeriodOfValidity, targetInstance.authentication);
       
       // if everything worked fine then add harvested feature info to summary
@@ -99,6 +102,36 @@ async function fetchAndIntegrateSpatialUnitFeatures(sourceInstance, spatialUnitM
     let errorOccurred = UtilHelper.makeErrorObject("Error while integrating data to KomMonitor instance with URL " + targetInstance.url, error);
     summary.errorsOccurred.push(errorOccurred);
   }
+}
+
+function applyOptionalPrefixes(geojson, spatialUnitMappingDef){
+
+  let sourceFeatureIdPrefix = spatialUnitMappingDef.sourceFeatureIdPrefix;
+  let sourceFeatureNamePrefix = spatialUnitMappingDef.sourceFeatureNamePrefix;
+  let targetFeatureIdPrefix = spatialUnitMappingDef.targetFeatureIdPrefix;
+  let targetFeatureNamePrefix = spatialUnitMappingDef.targetFeatureNamePrefix;
+
+  for (const feature of geojson.features) {
+      //delete periodOfValidity properties for each feature
+      delete feature.properties.validStartDate;
+      delete feature.properties.validEndDate;
+
+      if(sourceFeatureIdPrefix && String(feature.properties[process.env.FEATURE_ID_PROPERTY_NAME]).startsWith(sourceFeatureIdPrefix)){
+        feature.properties[process.env.FEATURE_ID_PROPERTY_NAME] = String(feature.properties[process.env.FEATURE_ID_PROPERTY_NAME]).replace(sourceFeatureIdPrefix,"");
+      }
+      if(sourceFeatureNamePrefix && String(feature.properties[process.env.FEATURE_NAME_PROPERTY_NAME]).startsWith(sourceFeatureNamePrefix)){
+        feature.properties[process.env.FEATURE_NAME_PROPERTY_NAME] = String(feature.properties[process.env.FEATURE_NAME_PROPERTY_NAME]).replace(sourceFeatureNamePrefix,"");
+      }
+      if(targetFeatureIdPrefix){
+        feature.properties[process.env.FEATURE_ID_PROPERTY_NAME] = targetFeatureIdPrefix + feature.properties[process.env.FEATURE_ID_PROPERTY_NAME];
+      }
+      if(targetFeatureNamePrefix){
+        feature.properties[process.env.FEATURE_NAME_PROPERTY_NAME] = targetFeatureNamePrefix + feature.properties[process.env.FEATURE_NAME_PROPERTY_NAME];
+      }
+      
+  }
+
+  return geojson;
 }
 
 function initSpatialUnitHarvestSummary(spatialUnitMappingDef) {
