@@ -7,6 +7,8 @@ let KommonitorHarvesterApi = require("kommonitorHarvesterApi");
 
  const keycloakHelper = require("./KeycloakHelperService");
 
+ let UtilHelper = require('../utils/UtilHelper');
+
 /**
  * send request against KomMonitor DataManagement API to update spatial unit according to id
  *
@@ -80,22 +82,11 @@ exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, target
   return await axios.put(baseUrlPath + "/indicators/" + indicatorId, body, config)
     .then(response => {
 
-      let mappingResultType = new KommonitorHarvesterApi.IndicatorSpatialUnitMappingResultType();
-      mappingResultType.targetSpatialUnitDatasetId = targetSpatialUnitId;
-      mappingResultType.numberOfHarvestedFeatures =  indicatorValues.length;
-
-      return mappingResultType; 
+      return true;
     })
     .catch(error => {
       console.log("Error when fetching indicator. Error was: " + error);
       
-      let mappingResultType = new KommonitorHarvesterApi.IndicatorSpatialUnitMappingResultType();
-      mappingResultType.targetSpatialUnitDatasetId = targetSpatialUnitId;
-      mappingResultType.numberOfHarvestedFeatures =  0;
-      mappingResultType.errorOccurred = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
-      mappingResultType.errorOccurred.code = error.code;
-      mappingResultType.errorOccurred.message = error.message;
-
-      return mappingResultType;
+      throw error;
     });
 }

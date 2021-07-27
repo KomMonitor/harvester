@@ -19,7 +19,8 @@ var initKeycloak = function (authenticationType) {
   keycloakRealm = authenticationType.keycloakRealm;
   keycloakClientID = authenticationType.keycloakClientId;
   keycloakUser = authenticationType.username;
-  keycloakUserPassword = EncryptionHelper.decryptAesCBC(authenticationType.password);
+  // keycloakUserPassword = EncryptionHelper.decryptAesCBC(authenticationType.password);
+  keycloakUserPassword = authenticationType.password;
 };
 
 const requestKeycloakToken = async function (authenticationType) {
@@ -33,7 +34,10 @@ const requestKeycloakToken = async function (authenticationType) {
     "grant_type": "password"
   };
 
-  var keycloakBearerTokenURL = keycloakTargetURL + "realms/" + keycloakRealm + "/protocol/openid-connect/token";
+  console.log("requesting keycloak bearer token for user " + keycloakUser + " authenticating against Keycloak instance at URL " 
+    + keycloakTargetURL + " with realm " + keycloakRealm + "");
+
+  var keycloakBearerTokenURL = keycloakTargetURL + "/realms/" + keycloakRealm + "/protocol/openid-connect/token";
 
   const config = {
     headers: {

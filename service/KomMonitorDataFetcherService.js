@@ -39,7 +39,7 @@ exports.fetchSpatialUnitById = async function(baseUrlPath, spatialUnitId, authen
       console.log("Error when fetching spatial unit. Error was: " + error);
       throw error;
     });
-}
+};
 
 
 /**
@@ -103,7 +103,7 @@ exports.fetchIndicatorById = async function(baseUrlPath, indicatorId, targetSpat
       console.log("Error when fetching indicator. Error was: " + error);
       throw error;
     });
-}
+};
 
 function checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath) {
   if (authenticationType.type == KommonitorHarvesterApi.AuthenticationType.TypeEnum.NONE) {

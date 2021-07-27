@@ -5,6 +5,8 @@ let KomMonitorDataIntegrator = require('./KomMonitorDataIntegrationService');
 
 let KommonitorHarvesterApi = require('kommonitorHarvesterApi');
 
+let UtilHelper = require('../utils/UtilHelper');
+
 /**
  * Perform harvesting process according to submitted config.
  * Perform harvesting process according to submitted config.
@@ -80,7 +82,7 @@ async function fetchAndIntegrateSpatialUnitFeatures(sourceInstance, spatialUnitM
     } catch (error) {
       console.error("Error while fetching data from KomMonitor instance with URL " + sourceInstance.url + ". Error is: \n" + error);
 
-      let errorOccurred = makeErrorObject(error);
+      let errorOccurred = UtilHelper.makeErrorObject("Error while fetching data from KomMonitor instance with URL " + sourceInstance.url, error);
       summary.errorsOccurred.push(errorOccurred);
     }
 
@@ -94,16 +96,9 @@ async function fetchAndIntegrateSpatialUnitFeatures(sourceInstance, spatialUnitM
   } catch (error) {
     console.error("Error while integrating data to KomMonitor instance with URL " + targetInstance.url + ". Error is: \n" + error);
 
-    let errorOccurred = makeErrorObject(error);
+    let errorOccurred = UtilHelper.makeErrorObject("Error while integrating data to KomMonitor instance with URL " + targetInstance.url, error);
     summary.errorsOccurred.push(errorOccurred);
   }
-}
-
-function makeErrorObject(error) {
-  let errorOccurred = new KommonitorHarvesterApi.SummaryTypeErrorsOccurred();
-  errorOccurred.code = error.code;
-  errorOccurred.message = error.message;
-  return errorOccurred;
 }
 
 function initSpatialUnitHarvestSummary(spatialUnitMappingDef) {
