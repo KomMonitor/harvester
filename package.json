@@ -22,7 +22,8 @@
     "js-yaml": "^3.3.0",
     "keycloak-js": "10.0.1",
     "oas3-tools": "^2.2.3",
-    "querystring": "^0.2.1"
+    "querystring": "^0.2.1",
+    "superagent": "^6.1.0"
   },
   "devDependencies": {
     "@release-it/keep-a-changelog": "^2.2.2",
