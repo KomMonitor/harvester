@@ -1,5 +1,6 @@
 'use strict';
 
+let HarvesterHelper = require('./HarvesterServiceHelper');
 
 /**
  * Perform harvesting process according to submitted config.
@@ -9,17 +10,16 @@
  * returns HarvesterOutputType
  **/
 exports.executeHarvesting = function(body) {
-  return new Promise(function(resolve, reject) {
-    var examples = {};
-    examples['application/json'] = {
-  "indicatorSummary" : [ "", "" ],
-  "spatialUnitSummary" : [ "", "" ]
-};
-    if (Object.keys(examples).length > 0) {
-      resolve(examples[Object.keys(examples)[0]]);
-    } else {
-      resolve();
-    }
+  return new Promise(async function(resolve, reject) {
+
+    try {
+      let harvesterOutput = await HarvesterHelper.executeHarvestRequest(body);
+
+      resolve(harvesterOutput); 
+    } catch (error) {
+      console.error(error);
+      reject(error);
+    }    
   });
 }
 
