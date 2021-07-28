@@ -50,11 +50,11 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
  *
  * baseUrlPath String starting URL path of running KomMonitor DataManagement API instance. It has to be appended with the path to fetch indicator
  * indicatorId String unique identifier of the indicator
- * targetSpatialUnitId String unique identifier of the target spatial unit
+ * targetIndicatorMetadata Object indicator metadata
  *
  **/
-exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, targetSpatialUnitId, indicatorValues, authenticationType) {
-  console.log("integrating indicator into KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitId);
+exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, targetIndicatorMetadata, targetSpatialUnitMetadata, indicatorValues, authenticationType) {
+  console.log("integrating indicator into KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitMetadata.spatialUnitId);
 
   var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
   config.headers["Content-Type"] = "application/json";
@@ -65,16 +65,8 @@ exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, target
     "allowedRoles": [
       
     ],
-    "applicableSpatialUnit": targetSpatialUnitId,
-    "defaultClassificationMapping": {
-      "colorBrewerSchemeName": "blues",
-      "items": [
-        {
-          "defaultColorAsHex": "string",
-          "defaultCustomRating": "string"
-        }
-      ]
-    },
+    "applicableSpatialUnit": targetSpatialUnitMetadata.spatialUnitLevel,
+    "defaultClassificationMapping": targetIndicatorMetadata.defaultClassificationMapping,
     "indicatorValues": indicatorValues
   };
 

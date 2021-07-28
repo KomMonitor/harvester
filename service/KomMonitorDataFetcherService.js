@@ -41,6 +41,27 @@ exports.fetchSpatialUnitById = async function(baseUrlPath, spatialUnitId, authen
     });
 };
 
+exports.fetchSpatialUnitMetadataById = async function(baseUrlPath, spatialUnitId, authenticationType) {
+  console.log("fetching spatial unit metadata from KomMonitor data management API with basepath " + baseUrlPath + " for id " + spatialUnitId);
+
+  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+
+  // if no auth is used then we must use public endpoint
+  baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
+
+  //GET /spatial-units/{spatialUnitId}/allFeatures
+  return await axios.get(baseUrlPath + "/spatial-units/" + spatialUnitId, config)
+    .then(response => {
+      // response.data should be the respective GeoJSON as String
+      response = encryptionHelper.decryptAPIResponseIfRequired(response);
+      return response.data;
+    })
+    .catch(error => {
+      console.log("Error when fetching spatial unit. Error was: " + error);
+      throw error;
+    });
+};
+
 
 /**
  * send request against KomMonitor DataManagement API to fetch georesource according to id
@@ -93,7 +114,28 @@ exports.fetchIndicatorById = async function(baseUrlPath, indicatorId, targetSpat
   baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
 
   //GET /indicators/{indicatorId}/{targetSpatialUnitId}/allFeatures
-  return await axios.get(baseUrlPath + "/indicators/" + indicatorId + "/" + targetSpatialUnitId + "/allFeatures?" + simplifyGeometriesParameterQueryString, config)
+  return await axios.get(baseUrlPath + "/indicators/" + indicatorId + "/" + targetSpatialUnitId + "/without-geometry", config)
+    .then(response => {
+      // response.data should be the respective GeoJSON as String
+      response = encryptionHelper.decryptAPIResponseIfRequired(response);
+      return response.data;
+    })
+    .catch(error => {
+      console.log("Error when fetching indicator. Error was: " + error);
+      throw error;
+    });
+};
+
+exports.fetchIndicatorMetadataById = async function(baseUrlPath, indicatorId, authenticationType) {
+  console.log("fetching indicator metadata from KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId);
+
+  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+
+  // if no auth is used then we must use public endpoint
+  baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
+
+  //GET /indicators/{indicatorId}/{targetSpatialUnitId}/allFeatures
+  return await axios.get(baseUrlPath + "/indicators/" + indicatorId, config)
     .then(response => {
       // response.data should be the respective GeoJSON as String
       response = encryptionHelper.decryptAPIResponseIfRequired(response);
