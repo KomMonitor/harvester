@@ -31,7 +31,8 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
     "periodOfValidity": {
       "endDate": periodOfValidityType.validEndDate,
       "startDate": periodOfValidityType.validStartDate
-    }
+    },
+    "isPartialUpdate": true // mark import as partial 
   };
 
   //PUT /spatial-units/{spatialUnitId}
