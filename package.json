@@ -1,6 +1,6 @@
 {
   "name": "kommonitor-harvester",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "KomMonitor Harvester API to harvest/transfer spatial data from one instance to another",
   "main": "index.js",
   "scripts": {
