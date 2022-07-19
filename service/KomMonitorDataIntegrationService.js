@@ -3,11 +3,34 @@
  // axios os used to execute HTTP requests in a Promise-based manner
  const axios = require("axios");
 
-let KommonitorHarvesterApi = require("kommonitorHarvesterApi");
+ let KommonitorHarvesterApi = require("kommonitorHarvesterApi");
 
- const keycloakHelper = require("./KeycloakHelperService");
+ const keycloakHelper = require("kommonitor-keycloak-helper");
 
  let UtilHelper = require('../utils/UtilHelper');
+
+ const configureConfigObject = async function(authenticationType){
+  let config = {
+    headers: {}
+  };
+
+  if(authenticationType.type == KommonitorHarvesterApi.AuthenticationType.TypeEnum.KEYCLOAK){
+    /*
+      "authentication": {
+        "type": "KEYCLOAK",
+        "username": "string",
+        "password": "string",
+        "keycloakUrl": "string",
+        "keycloakRealm": "string",
+        "keycloakClientId": "string"
+      }
+    */
+      keycloakHelper.initKeycloakHelper(authenticationType.keycloakUrl, authenticationType.keycloakRealm, authenticationType.keycloakClientId, undefined, authenticationType.username, authenticationType.password, process.env.KOMMONITOR_ADMIN_ROLENAME);
+
+    config = await keycloakHelper.requestAccessToken();
+  }
+  return config;
+ };
 
 /**
  * send request against KomMonitor DataManagement API to update spatial unit according to id
@@ -21,7 +44,7 @@ let KommonitorHarvesterApi = require("kommonitorHarvesterApi");
 exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, geojsonString, periodOfValidityType, authenticationType) {
   console.log("integrating spatial unit into KomMonitor data management API with basepath " + baseUrlPath + " for id " + spatialUnitId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
   config.headers["Content-Type"] = "application/json";
   config.maxContentLength = Infinity;
   config.maxBodyLength = Infinity;
@@ -57,15 +80,13 @@ exports.integrateSpatialUnitById = async function(baseUrlPath, spatialUnitId, ge
 exports.integrateIndicatorById = async function(baseUrlPath, indicatorId, targetIndicatorMetadata, targetSpatialUnitMetadata, indicatorValues, authenticationType) {
   console.log("integrating indicator into KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitMetadata.spatialUnitId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
   config.headers["Content-Type"] = "application/json";
   config.maxContentLength = Infinity;
   config.maxBodyLength = Infinity;
 
   let body = {
-    "allowedRoles": [
-      
-    ],
+    "allowedRoles": targetIndicatorMetadata.allowedRoles,
     "applicableSpatialUnit": targetSpatialUnitMetadata.spatialUnitLevel,
     "defaultClassificationMapping": targetIndicatorMetadata.defaultClassificationMapping,
     "indicatorValues": indicatorValues

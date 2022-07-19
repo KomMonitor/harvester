@@ -4,12 +4,35 @@
  const axios = require("axios");
 
  const encryptionHelper = require("./EncryptionHelperService");
- const keycloakHelper = require("./KeycloakHelperService");
+ const keycloakHelper = require("kommonitor-keycloak-helper");
  let KommonitorHarvesterApi = require('kommonitorHarvesterApi');
 
  const simplifyGeometryParameterName = process.env.GEOMETRY_SIMPLIFICATION_PARAMETER_NAME;
  const simplifyGeometryParameterValue = process.env.GEOMETRY_SIMPLIFICATION_PARAMETER_VALUE;
  const simplifyGeometriesParameterQueryString = simplifyGeometryParameterName + "=" + simplifyGeometryParameterValue;
+
+ const configureConfigObject = async function(authenticationType){
+  let config = {
+    headers: {}
+  };
+
+  if(authenticationType.type == KommonitorHarvesterApi.AuthenticationType.TypeEnum.KEYCLOAK){
+    /*
+      "authentication": {
+        "type": "KEYCLOAK",
+        "username": "string",
+        "password": "string",
+        "keycloakUrl": "string",
+        "keycloakRealm": "string",
+        "keycloakClientId": "string"
+      }
+    */
+      keycloakHelper.initKeycloakHelper(authenticationType.keycloakUrl, authenticationType.keycloakRealm, authenticationType.keycloakClientId, undefined, authenticationType.username, authenticationType.password, process.env.KOMMONITOR_ADMIN_ROLENAME);
+
+    config = await keycloakHelper.requestAccessToken();
+  }
+  return config;
+ };
 
 /**
  * send request against KomMonitor DataManagement API to fetch spatial unit according to id
@@ -23,7 +46,7 @@
 exports.fetchSpatialUnitById = async function(baseUrlPath, spatialUnitId, authenticationType) {
   console.log("fetching spatial unit from KomMonitor data management API with basepath " + baseUrlPath + " for id " + spatialUnitId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
 
   // if no auth is used then we must use public endpoint
   baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
@@ -44,7 +67,7 @@ exports.fetchSpatialUnitById = async function(baseUrlPath, spatialUnitId, authen
 exports.fetchSpatialUnitMetadataById = async function(baseUrlPath, spatialUnitId, authenticationType) {
   console.log("fetching spatial unit metadata from KomMonitor data management API with basepath " + baseUrlPath + " for id " + spatialUnitId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
 
   // if no auth is used then we must use public endpoint
   baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
@@ -75,7 +98,7 @@ exports.fetchSpatialUnitMetadataById = async function(baseUrlPath, spatialUnitId
 exports.fetchGeoresourceById = async function(baseUrlPath, georesourceId, authenticationType) {
   console.log("fetching georesource from KomMonitor data management API with basepath " + baseUrlPath + " for id " + georesourceId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
 
   // if no auth is used then we must use public endpoint
   baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
@@ -108,7 +131,8 @@ exports.fetchGeoresourceById = async function(baseUrlPath, georesourceId, authen
 exports.fetchIndicatorById = async function(baseUrlPath, indicatorId, targetSpatialUnitId, authenticationType) {
   console.log("fetching indicator from KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId + " and targetSpatialUnitId " + targetSpatialUnitId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
+  
 
   // if no auth is used then we must use public endpoint
   baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);
@@ -129,7 +153,7 @@ exports.fetchIndicatorById = async function(baseUrlPath, indicatorId, targetSpat
 exports.fetchIndicatorMetadataById = async function(baseUrlPath, indicatorId, authenticationType) {
   console.log("fetching indicator metadata from KomMonitor data management API with basepath " + baseUrlPath + " for id " + indicatorId);
 
-  var config = await keycloakHelper.getKeycloakAxiosConfig(authenticationType);
+  let config = configureConfigObject(authenticationType);
 
   // if no auth is used then we must use public endpoint
   baseUrlPath = checkForPublicOrProtectedEndpoint(authenticationType, baseUrlPath);

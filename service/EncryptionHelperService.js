@@ -73,7 +73,7 @@ exports.decryptAPIResponseIfRequired = function (response) {
   // {encryptedData: encryptedData}
   // using AES-CBC
 
-  if (JSON.parse(process.env.ENCRYPTION_COMPLETE_ENABLED) && response.data.encryptedData) {
+  if (JSON.parse(process.env.ENCRYPTION_ENABLED) && response.data.encryptedData) {
     try {
       var encryptedString = response.data.encryptedData;
 
